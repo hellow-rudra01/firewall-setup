@@ -1,0 +1,58 @@
+Windows (Windows 10 / 11) — step by step
+A. GUI method (easy)
+
+Open Start → type Windows Defender Firewall → open Windows Defender Firewall with Advanced Security.
+
+Click Inbound Rules on left.
+
+Click New Rule… on right.
+
+Choose Port → Next.
+
+Select TCP, enter 23 in Specific local ports → Next.
+
+Choose Block the connection → Next.
+
+Check Domain/Private/Public as needed → Next.
+
+Give rule a name like Block-Telnet-23-test → Finish.
+
+Take screenshot showing the new rule in the list (name, action = Block).
+
+B. PowerShell method (fast, recordable)
+
+Open PowerShell as Administrator.
+
+List current firewall rules (filter helpful ones):
+
+Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select-Object DisplayName,Direction,Action
+
+
+Add rule to block inbound TCP port 23:
+
+New-NetFirewallRule -DisplayName "Block-Telnet-23-test" -Direction Inbound -Action Block -Protocol TCP -LocalPort 23
+
+
+Verify rule added:
+
+Get-NetFirewallRule -DisplayName "Block-Telnet-23-test" | Format-List *
+
+
+Test port (from same machine):
+
+Test-NetConnection -ComputerName localhost -Port 23
+
+
+TcpTestSucceeded should be False if blocked.
+
+If testing from another machine, run:
+
+Test-NetConnection -ComputerName <WindowsIP> -Port 23
+
+
+Remove the test rule when done:
+
+Remove-NetFirewallRule -DisplayName "Block-Telnet-23-test"
+
+
+Take screenshots: PowerShell output showing rule added, Test-NetConnection output, and removal.
